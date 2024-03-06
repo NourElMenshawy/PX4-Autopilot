@@ -833,7 +833,7 @@ Commander::handle_command(const vehicle_command_s &cmd)
 							desired_nav_state = vehicle_status_s::NAVIGATION_STATE_AUTO_PRECLAND;
 							break;
 
-							case PX4_CUSTOM_SUB_MODE_EXTERNAL1...PX4_CUSTOM_SUB_MODE_EXTERNAL8:
+						case PX4_CUSTOM_SUB_MODE_EXTERNAL1...PX4_CUSTOM_SUB_MODE_EXTERNAL8:
 							desired_nav_state = vehicle_status_s::NAVIGATION_STATE_EXTERNAL1 + (custom_sub_mode - PX4_CUSTOM_SUB_MODE_EXTERNAL1);
 							break;
 
@@ -899,7 +899,7 @@ Commander::handle_command(const vehicle_command_s &cmd)
 		}
 		break;
 
-		case vehicle_command_s::VEHICLE_CMD_SET_NAV_STATE: { // Used from ROS
+	case vehicle_command_s::VEHICLE_CMD_SET_NAV_STATE: { // Used from ROS
 			uint8_t desired_nav_state = (uint8_t)(cmd.param1 + 0.5f);
 
 			if (_user_mode_intention.change(desired_nav_state, getSourceFromCommand(cmd))) {
@@ -1123,38 +1123,38 @@ Commander::handle_command(const vehicle_command_s &cmd)
 
 	case vehicle_command_s::VEHICLE_CMD_DO_ORBIT: {
 
-		transition_result_t main_ret;
+			transition_result_t main_ret;
 
-		if (_vehicle_status.in_transition_mode) {
-			main_ret = TRANSITION_DENIED;
+			if (_vehicle_status.in_transition_mode) {
+				main_ret = TRANSITION_DENIED;
 
-		} else if (_vehicle_status.vehicle_type == vehicle_status_s::VEHICLE_TYPE_FIXED_WING) {
-			// for fixed wings the behavior of orbit is the same as loiter
-			if (_user_mode_intention.change(vehicle_status_s::NAVIGATION_STATE_AUTO_LOITER, getSourceFromCommand(cmd))) {
-				main_ret = TRANSITION_CHANGED;
+			} else if (_vehicle_status.vehicle_type == vehicle_status_s::VEHICLE_TYPE_FIXED_WING) {
+				// for fixed wings the behavior of orbit is the same as loiter
+				if (_user_mode_intention.change(vehicle_status_s::NAVIGATION_STATE_AUTO_LOITER, getSourceFromCommand(cmd))) {
+					main_ret = TRANSITION_CHANGED;
+
+				} else {
+					main_ret = TRANSITION_DENIED;
+				}
 
 			} else {
-				main_ret = TRANSITION_DENIED;
+				// Switch to orbit state and let the orbit task handle the command further
+				if (_user_mode_intention.change(vehicle_status_s::NAVIGATION_STATE_ORBIT, getSourceFromCommand(cmd))) {
+					main_ret = TRANSITION_CHANGED;
+
+				} else {
+					main_ret = TRANSITION_DENIED;
+				}
 			}
 
-		} else {
-			// Switch to orbit state and let the orbit task handle the command further
-			if (_user_mode_intention.change(vehicle_status_s::NAVIGATION_STATE_ORBIT, getSourceFromCommand(cmd))) {
-				main_ret = TRANSITION_CHANGED;
+			if (main_ret != TRANSITION_DENIED) {
+				cmd_result = vehicle_command_ack_s::VEHICLE_CMD_RESULT_ACCEPTED;
 
 			} else {
-				main_ret = TRANSITION_DENIED;
+				cmd_result = vehicle_command_ack_s::VEHICLE_CMD_RESULT_TEMPORARILY_REJECTED;
+				mavlink_log_critical(&_mavlink_log_pub, "Orbit command rejected");
 			}
 		}
-
-		if (main_ret != TRANSITION_DENIED) {
-			cmd_result = vehicle_command_ack_s::VEHICLE_CMD_RESULT_ACCEPTED;
-
-		} else {
-			cmd_result = vehicle_command_ack_s::VEHICLE_CMD_RESULT_TEMPORARILY_REJECTED;
-			mavlink_log_critical(&_mavlink_log_pub, "Orbit command rejected");
-		}
-}
 		break;
 
 	case vehicle_command_s::VEHICLE_CMD_DO_FIGUREEIGHT: {
@@ -1447,7 +1447,7 @@ Commander::handle_command(const vehicle_command_s &cmd)
 		answer_command(cmd, vehicle_command_ack_s::VEHICLE_CMD_RESULT_ACCEPTED);
 		break;
 
-		case vehicle_command_s::VEHICLE_CMD_DO_SET_ACTUATOR:
+	case vehicle_command_s::VEHICLE_CMD_DO_SET_ACTUATOR:
 		answer_command(cmd, vehicle_command_ack_s::VEHICLE_CMD_RESULT_ACCEPTED);
 		break;
 
@@ -2246,7 +2246,7 @@ void Commander::handleAutoDisarm()
 
 			const bool landed_amid_mission = (_vehicle_status.nav_state == vehicle_status_s::NAVIGATION_STATE_AUTO_MISSION)
 							 && !_mission_result_sub.get().finished;
-const bool auto_disarm_land_enabled = _param_com_disarm_land.get() > 0 && !landed_amid_mission
+			const bool auto_disarm_land_enabled = _param_com_disarm_land.get() > 0 && !landed_amid_mission
 							      && !_config_overrides.disable_auto_disarm;
 
 			if (auto_disarm_land_enabled && _have_taken_off_since_arming) {
@@ -2556,7 +2556,7 @@ void Commander::updateControlMode()
 
 	mode_util::getVehicleControlMode(_vehicle_status.nav_state,
 					 _vehicle_status.vehicle_type, _offboard_control_mode_sub.get(), _vehicle_control_mode);
-_mode_management.updateControlMode(_vehicle_status.nav_state, _vehicle_control_mode);
+	_mode_management.updateControlMode(_vehicle_status.nav_state, _vehicle_control_mode);
 
 	_vehicle_control_mode.flag_armed = isArmed();
 	_vehicle_control_mode.flag_multicopter_position_control_enabled =

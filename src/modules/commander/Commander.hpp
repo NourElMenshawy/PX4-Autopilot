@@ -125,7 +125,7 @@ public:
 
 private:
 	bool isArmed() const { return (_vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED); }
-static ModeChangeSource getSourceFromCommand(const vehicle_command_s &cmd);
+	static ModeChangeSource getSourceFromCommand(const vehicle_command_s &cmd);
 
 	void answer_command(const vehicle_command_s &cmd, uint8_t result);
 
@@ -234,7 +234,7 @@ static ModeChangeSource getSourceFromCommand(const vehicle_command_s &cmd);
 
 	const failsafe_flags_s &_failsafe_flags{_health_and_arming_checks.failsafeFlags()};
 	HomePosition 		_home_position{_failsafe_flags};
-config_overrides_s   _config_overrides{};
+	config_overrides_s   _config_overrides{};
 
 
 	Hysteresis _auto_disarm_landed{false};

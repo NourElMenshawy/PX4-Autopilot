@@ -294,7 +294,7 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 		handle_message_named_value_float(msg);
 		break;
 
-case MAVLINK_MSG_ID_NAMED_VALUE_INT:
+	case MAVLINK_MSG_ID_NAMED_VALUE_INT:
 		handle_message_named_value_int(msg);
 		break;
 

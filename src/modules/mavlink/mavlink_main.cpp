@@ -110,13 +110,13 @@ Mavlink::Mavlink() :
 
 	if (sys_id > 0 && sys_id < 255) {
 		mavlink_system.sysid = sys_id;
-			}
+	}
 
 	int comp_id = _param_mav_comp_id.get();
 
 	if (comp_id > 0 && comp_id < 255) {
 		mavlink_system.compid = comp_id;
-			}
+	}
 
 	if (_first_start_time == 0) {
 		_first_start_time = hrt_absolute_time();
