@@ -36,6 +36,7 @@ px4_add_module(
 	SRCS
 		payload_deliverer.cpp
 		gripper.cpp
+		latch.cpp
 	MODULE_CONFIG
 		module.yaml
 	COMPILE_FLAGS

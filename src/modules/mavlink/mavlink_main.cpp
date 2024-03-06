@@ -110,13 +110,13 @@ Mavlink::Mavlink() :
 
 	if (sys_id > 0 && sys_id < 255) {
 		mavlink_system.sysid = sys_id;
-	}
+			}
 
 	int comp_id = _param_mav_comp_id.get();
 
 	if (comp_id > 0 && comp_id < 255) {
 		mavlink_system.compid = comp_id;
-	}
+			}
 
 	if (_first_start_time == 0) {
 		_first_start_time = hrt_absolute_time();
@@ -1444,6 +1444,7 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 		configure_stream_local("VFR_HUD", 4.0f);
 		configure_stream_local("VIBRATION", 0.1f);
 		configure_stream_local("WIND_COV", 0.5f);
+		//configure_stream_local("LATCH_SENSOR_STATUS", 0.5f);
 
 #if !defined(CONSTRAINED_FLASH)
 		configure_stream_local("DEBUG", 1.0f);
@@ -1620,6 +1621,7 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 	/* fallthrough */
 	case MAVLINK_MODE_CUSTOM:
 		//stream nothing
+		configure_stream_local("LATCH_SENSOR_STATUS", 10.0f);
 		break;
 
 	case MAVLINK_MODE_CONFIG: // USB

@@ -36,7 +36,7 @@
  * @author Junwoo Hwang (junwoo091400@gmail.com)
  */
 #include "gripper.h"
-
+#include "latch.h"
 #include <drivers/drv_hrt.h>
 #include <px4_platform_common/module.h>
 #include <px4_platform_common/module_params.h>
@@ -120,6 +120,11 @@ private:
 	void gripper_update(const hrt_abstime &now);
 
 	/**
+	 * @brief Update Latch status by sending vehicle command to external board
+	 */
+	void latch_update();
+
+	/**
 	 * @brief Commands the payload delivery mechanism based on the received vehicle command
 	 *
 	 * Also handle vehicle command acknowledgement once the delivery is confirmed from the mechanism
@@ -134,6 +139,23 @@ private:
 	bool send_gripper_vehicle_command(const int32_t gripper_action);
 
 	/**
+	 * @brief Send DO_LATCH vehicle command to external board
+	*/
+	bool send_latch_vehicle_command();
+
+	/**
+	 * @brief Send ack response to VEHICLE_CMD_DO_LATCH vehicle command with specified parameters
+	 *
+	 * @param now
+	 * @param command_result
+	 * @param target_system
+	 * @param target_component
+	 */
+
+	bool send_latch_vehicle_command_ack(const hrt_abstime now, const uint8_t command_result, const uint8_t target_system,
+					      const uint8_t target_component);
+
+	/**
 	 * @brief Send ack response to DO_GRIPPER vehicle command with specified parameters
 	 *
 	 * For the case of VEHICLE_CMD_RESULT_IN_PROGRESS, progress percentage parameter will be filled out
@@ -142,6 +164,7 @@ private:
 					      const uint8_t target_component);
 
 	Gripper _gripper;
+	Latch  _latch;
 
 	// Cached values of the currently running vehicle command for the gripper action
 	// used for conflicting vehicle commands & successful vehicle command acknowledgements

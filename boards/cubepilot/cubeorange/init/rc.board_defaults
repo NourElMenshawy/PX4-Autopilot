@@ -14,4 +14,10 @@ param set-default SENS_EN_THERMAL 0
 
 param set-default -s SENS_TEMP_ID 2621474
 
+# Serial for iocontrol board
+param set-default MAV_1_CONFIG 102 	# TELEM2
+param set-default MAV_1_MODE 1 	        # CUSTOM
+param set-default SER_TEL2_BAUD 57600  	# 57600
+param set-default MAV_1_FORWARD 1
+
 set IOFW "/etc/extras/cubepilot_io-v2_default.bin"

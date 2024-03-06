@@ -125,7 +125,7 @@ public:
 
 private:
 	bool isArmed() const { return (_vehicle_status.arming_state == vehicle_status_s::ARMING_STATE_ARMED); }
-	static ModeChangeSource getSourceFromCommand(const vehicle_command_s &cmd);
+static ModeChangeSource getSourceFromCommand(const vehicle_command_s &cmd);
 
 	void answer_command(const vehicle_command_s &cmd, uint8_t result);
 
@@ -145,6 +145,8 @@ private:
 	void manualControlCheck();
 
 	void offboardControlCheck();
+
+	void payloadCheck();
 
 	/**
 	 * @brief Handle incoming vehicle command relavant to Commander
@@ -232,7 +234,7 @@ private:
 
 	const failsafe_flags_s &_failsafe_flags{_health_and_arming_checks.failsafeFlags()};
 	HomePosition 		_home_position{_failsafe_flags};
-	config_overrides_s   _config_overrides{};
+config_overrides_s   _config_overrides{};
 
 
 	Hysteresis _auto_disarm_landed{false};
@@ -296,6 +298,7 @@ private:
 	uORB::Subscription					_vehicle_command_mode_executor_sub{ORB_ID(vehicle_command_mode_executor)};
 	uORB::Subscription					_vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
 	uORB::Subscription					_vtol_vehicle_status_sub{ORB_ID(vtol_vehicle_status)};
+	uORB::Subscription                                      _latch_sensor_status_sub{ORB_ID(latch_sensor_status)};
 
 	uORB::SubscriptionInterval				_parameter_update_sub{ORB_ID(parameter_update), 1_s};
 

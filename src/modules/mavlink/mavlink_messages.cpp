@@ -120,6 +120,7 @@
 #include "streams/VFR_HUD.hpp"
 #include "streams/VIBRATION.hpp"
 #include "streams/WIND_COV.hpp"
+#include "streams/LATCH_SENSOR_STATUS.hpp"
 #if defined(MAVLINK_MSG_ID_FIGURE_EIGHT_EXECUTION_STATUS)
 #include "streams/FIGURE_EIGHT_EXECUTION_STATUS.hpp"
 #endif // MAVLINK_MSG_ID_FIGURE_EIGHT_EXECUTION_STATUS
@@ -318,6 +319,9 @@ static const StreamListItem streams_list[] = {
 #endif // GLOBAL_POSITION_INT_HPP
 #if defined(LANDING_TARGET_HPP)
 	create_stream_list_item<MavlinkStreamLandingTarget>(),
+#endif
+#if defined(LATCH_SENSOR_STATUS_HPP)
+	create_stream_list_item<MavlinkStreamLatchSensorStatus>(),
 #endif
 #if defined(LOCAL_POSITION_NED_HPP)
 	create_stream_list_item<MavlinkStreamLocalPositionNED>(),
