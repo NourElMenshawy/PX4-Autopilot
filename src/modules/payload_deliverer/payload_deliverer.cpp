@@ -48,6 +48,7 @@ bool PayloadDeliverer::init()
 	}
 
 	configure_gripper();
+	_latch.init();
 	return true;
 }
 
@@ -104,6 +105,7 @@ void PayloadDeliverer::Run()
 	}
 
 	gripper_update(now);
+	latch_update();
 
 	if (_vehicle_command_sub.update(&vcmd)) {
 		handle_vehicle_command(now, &vcmd);
@@ -232,6 +234,24 @@ void PayloadDeliverer::handle_vehicle_command(const hrt_abstime &now,  const veh
 			_cur_vcmd_target_component = vehicle_command->source_component;
 		}
 	}
+	else if(vehicle_command->command == vehicle_command_s::VEHICLE_CMD_DO_LATCH) {
+		send_latch_vehicle_command_ack(now, vehicle_command_ack_s::VEHICLE_CMD_RESULT_ACCEPTED, vehicle_command->source_system,
+							 vehicle_command->source_component);
+		_cur_vcmd_target_system = vehicle_command->source_system;
+		_cur_vcmd_target_component = vehicle_command->source_component;
+
+	}
+
+}
+
+void PayloadDeliverer::latch_update()
+{
+
+	send_latch_vehicle_command();
+	px4_usleep(500_ms);
+	if(_latch.update()){
+		_latch.check();
+	}
 }
 
 bool PayloadDeliverer::send_gripper_vehicle_command(const int32_t gripper_action)
@@ -243,6 +263,39 @@ bool PayloadDeliverer::send_gripper_vehicle_command(const int32_t gripper_action
 	// Note: Integer type GRIPPER_ACTION gets formatted into a floating point here.
 	return _vehicle_command_pub.publish(vcmd);
 }
+
+bool PayloadDeliverer::send_latch_vehicle_command()
+{
+	vehicle_command_s vcmd{};
+	vcmd.timestamp = hrt_absolute_time();
+	vcmd.command = vehicle_command_s::VEHICLE_CMD_DO_LATCH;
+	vcmd.source_system = 1;
+	vcmd.source_component = 1;
+	vcmd.target_system = 99;
+	vcmd.target_component = 169;
+	return _vehicle_command_pub.publish(vcmd);
+}
+
+bool PayloadDeliverer::send_latch_vehicle_command_ack(const hrt_abstime now, const uint8_t command_result,
+		const uint8_t target_system, const uint8_t target_component)
+{
+	vehicle_command_ack_s vcmd_ack{};
+	vcmd_ack.timestamp = now;
+	vcmd_ack.command = vehicle_command_s::VEHICLE_CMD_DO_LATCH;
+	vcmd_ack.result = command_result;
+
+	switch (command_result) {
+	case vehicle_command_ack_s::VEHICLE_CMD_RESULT_IN_PROGRESS:
+		// Fill in the progress percentage field for IN_PROGRESS ack message
+		vcmd_ack.result_param1 = UINT8_MAX;
+		break;
+	}
+
+	vcmd_ack.target_system = target_system;
+	vcmd_ack.target_component = target_component;
+	return _vehicle_command_ack_pub.publish(vcmd_ack);
+}
+
 
 bool PayloadDeliverer::send_gripper_vehicle_command_ack(const hrt_abstime now, const uint8_t command_result,
 		const uint8_t target_system, const uint8_t target_component)
@@ -308,6 +361,7 @@ int PayloadDeliverer::print_status()
 	if (_gripper.is_valid()) {
 		PX4_INFO("Gripper state: %s", _gripper.get_state_str());
 	}
+	PX4_INFO("Latch state: %s", _latch.get_state_str());
 
 	return 0;
 }
@@ -326,6 +380,10 @@ int PayloadDeliverer::custom_command(int argc, char *argv[])
 
 		} else if (strcmp(argv[0], "gripper_close") == 0) {
 			get_instance()->gripper_close();
+			return 0;
+		}
+		else if(strcmp(argv[0], "print_status") == 0){
+			get_instance()->print_status();
 			return 0;
 		}
 	}
@@ -352,6 +410,7 @@ and communicates back the delivery result as an acknowledgement internally
 	PRINT_MODULE_USAGE_COMMAND_DESCR("gripper_test", "Tests the Gripper's release & grabbing sequence");
 	PRINT_MODULE_USAGE_COMMAND_DESCR("gripper_open", "Opens the gripper");
 	PRINT_MODULE_USAGE_COMMAND_DESCR("gripper_close", "Closes the gripper");
+	PRINT_MODULE_USAGE_COMMAND_DESCR("print_status", "Prints gripper and latch status");
 	PRINT_MODULE_USAGE_DEFAULT_COMMANDS();
 
 	return 0;

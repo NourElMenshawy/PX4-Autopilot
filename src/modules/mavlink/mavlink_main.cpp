@@ -1694,6 +1694,7 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 	/* fallthrough */
 	case MAVLINK_MODE_CUSTOM:
 		//stream nothing
+		configure_stream_local("LATCH_SENSOR_STATUS", 10.0f);
 		break;
 
 	case MAVLINK_MODE_CONFIG: // USB

@@ -135,6 +135,8 @@ private:
 
 	void offboardControlCheck();
 
+	void payloadCheck();
+
 	/**
 	 * @brief Handle incoming vehicle command relavant to Commander
 	 *
@@ -277,6 +279,7 @@ private:
 	uORB::Subscription					_vehicle_command_sub{ORB_ID(vehicle_command)};
 	uORB::Subscription					_vehicle_land_detected_sub{ORB_ID(vehicle_land_detected)};
 	uORB::Subscription					_vtol_vehicle_status_sub{ORB_ID(vtol_vehicle_status)};
+	uORB::Subscription                  _latch_sensor_status_sub{ORB_ID(latch_sensor_status)};
 
 	uORB::SubscriptionInterval				_parameter_update_sub{ORB_ID(parameter_update), 1_s};
 

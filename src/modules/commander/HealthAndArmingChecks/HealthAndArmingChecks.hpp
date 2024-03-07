@@ -55,6 +55,7 @@
 #include "checks/homePositionCheck.hpp"
 #include "checks/modeCheck.hpp"
 #include "checks/parachuteCheck.hpp"
+#include "checks/payloadCheck.hpp"
 #include "checks/powerCheck.hpp"
 #include "checks/rcCalibrationCheck.hpp"
 #include "checks/sdcardCheck.hpp"
@@ -127,6 +128,7 @@ private:
 	HomePositionChecks _home_position_checks;
 	ModeChecks _mode_checks;
 	ParachuteChecks _parachute_checks;
+	PayloadCheck    _payload_checks;
 	PowerChecks _power_checks;
 	RcCalibrationChecks _rc_calibration_checks;
 	SdCardChecks _sd_card_checks;
@@ -140,7 +142,7 @@ private:
 	VtolChecks _vtol_checks;
 	OffboardChecks _offboard_checks;
 
-	HealthAndArmingCheckBase *_checks[30] = {
+	HealthAndArmingCheckBase *_checks[31] = {
 		&_accelerometer_checks,
 		&_airspeed_checks,
 		&_baro_checks,
@@ -159,6 +161,7 @@ private:
 		&_mode_checks, // must be after _estimator_checks, _home_position_checks, _mission_checks, _offboard_checks
 		&_parachute_checks,
 		&_power_checks,
+		&_payload_checks,
 		&_rc_calibration_checks,
 		&_sd_card_checks,
 		&_system_checks, // must be after _estimator_checks & _home_position_checks

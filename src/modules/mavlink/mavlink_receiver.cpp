@@ -274,6 +274,10 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 		handle_message_statustext(msg);
 		break;
 
+	case MAVLINK_MSG_ID_LATCHSENSOR_STATUS:
+		handle_message_latchsensor_status(msg);
+		break;
+
 #if !defined(CONSTRAINED_FLASH)
 
 	case MAVLINK_MSG_ID_NAMED_VALUE_FLOAT:
@@ -3057,6 +3061,28 @@ MavlinkReceiver::handle_message_gimbal_device_attitude_status(mavlink_message_t 
 	gimbal_attitude_status.received_from_mavlink = true;
 
 	_gimbal_device_attitude_status_pub.publish(gimbal_attitude_status);
+}
+void
+MavlinkReceiver::handle_message_latchsensor_status(mavlink_message_t *msg)
+{
+	mavlink_latchsensor_status_t mavlink_latchsensor_status_msg;
+	mavlink_msg_latchsensor_status_decode(msg, &mavlink_latchsensor_status_msg);
+
+	latch_sensor_status_s latchsensor_status{};
+
+	latchsensor_status.latchsensor_1 = mavlink_latchsensor_status_msg.latchsensor_1;
+	latchsensor_status.latchsensor_2 = mavlink_latchsensor_status_msg.latchsensor_2;
+	latchsensor_status.latchsensor_3 = mavlink_latchsensor_status_msg.latchsensor_3;
+	latchsensor_status.latchsensor_4 = mavlink_latchsensor_status_msg.latchsensor_4;
+	if(latchsensor_status.latchsensor_1 || latchsensor_status.latchsensor_2 ||
+	   latchsensor_status.latchsensor_3 || latchsensor_status.latchsensor_4)
+	   {
+		_mavlink->send_statustext_critical("Payload not secured\t");
+		// events::send(events::ID("payload"), events::Log::Error,
+		// 		     "Latches are not locked");
+	   }
+
+	_latch_sensor_status_pub.publish(latchsensor_status);
 }
 
 void

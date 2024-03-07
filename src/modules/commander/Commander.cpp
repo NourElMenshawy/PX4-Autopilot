@@ -561,6 +561,14 @@ transition_result_t Commander::arm(arm_disarm_reason_t calling_reason, bool run_
 				tune_negative(true);
 				return TRANSITION_DENIED;
 			}
+			if (_failsafe_flags.payload_secure_failure) {
+
+				mavlink_log_critical(&_mavlink_log_pub, "Arming denied: payload not secured\t");
+				// events::send(events::ID("payload"), {events::Log::Critical, events::LogInternal::Info},
+				// 	     "Latches are not locked");
+				tune_negative(true);
+				return TRANSITION_DENIED;
+			}
 
 		} else if (calling_reason == arm_disarm_reason_t::rc_stick
 			   || calling_reason == arm_disarm_reason_t::rc_switch
@@ -1407,6 +1415,7 @@ Commander::handle_command(const vehicle_command_s &cmd)
 	case vehicle_command_s::VEHICLE_CMD_REQUEST_MESSAGE:
 	case vehicle_command_s::VEHICLE_CMD_DO_WINCH:
 	case vehicle_command_s::VEHICLE_CMD_DO_GRIPPER:
+	case vehicle_command_s::VEHICLE_CMD_DO_LATCH:
 		/* ignore commands that are handled by other parts of the system */
 		break;
 
@@ -1696,6 +1705,8 @@ void Commander::run()
 		manualControlCheck();
 
 		offboardControlCheck();
+
+		payloadCheck();
 
 		// data link checks which update the status
 		dataLinkCheck();
@@ -2809,6 +2820,23 @@ void Commander::send_parachute_command()
 
 	set_tune_override(tune_control_s::TUNE_ID_PARACHUTE_RELEASE);
 }
+
+
+void Commander::payloadCheck()
+{
+	latch_sensor_status_s _latch_sensor_status;
+
+	if(_latch_sensor_status_sub.update(&_latch_sensor_status))
+	{
+
+		if (_failsafe_flags.payload_secure_failure) {
+			_status_changed = true;
+		}
+
+	}
+
+}
+
 
 int Commander::print_usage(const char *reason)
 {
