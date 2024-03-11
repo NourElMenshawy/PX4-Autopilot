@@ -41,7 +41,7 @@ void PayloadCheck::checkAndReport(const Context &context, Report &reporter)
 
 	latch_sensor_status_s latch_sensor_status;
 
-	if (_latch_sensor_status_sub.update(&latch_sensor_status)) {
+	if (_latch_sensor_status_sub.copy(&latch_sensor_status)) {
 		//_latch_sensor_status_sub.copy(&latch_sensor_status);
 		PX4_INFO("Payload check \n");
 		if(latch_sensor_status.latchsensor_1 || latch_sensor_status.latchsensor_2 ||
